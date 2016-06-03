@@ -13,16 +13,16 @@
   <body>
     <div id="content-container">
       <div id="content-container-center">
-        <h3>${option_a} vs ${option_b}!</h3>
+        <h3 th:text="${option_a} + ' vs ' + ${option_b} + '!'">Option_a vs option_b!</h3>
         <form id="choice" name='form' method="POST" action="/">
-          <button id="a" type="submit" name="vote" class="a" value="a">${option_a}</button>
-          <button id="b" type="submit" name="vote" class="b" value="b">${option_b}</button>
+          <button id="a" type="submit" name="vote" class="a" value="a" th:text="${option_a}">Option_a</button>
+          <button id="b" type="submit" name="vote" class="b" value="b" th:text="${option_b}">Option_b</button>
         </form>
         <div id="tip">
           (Tip: you can change your vote)
-        </div>xmlns:th="http://www.thymeleaf.org"
-        <div id="hostname">
-          Vote processed by ${hostname}
+        </div>
+        <div id="hostname" th:text="'Vote processed by ' + ${hostname}">
+          Vote processed by hostname
         </div>
       </div>
     </div>
@@ -30,17 +30,19 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <script th:inline="javascript">
-      var vote = "${vote}";
+      var vote = [[${vote}]];
       
       if (!!vote) {
           if(vote == "a"){
+        	  var option = [[${option_a}]];
               $(".a").prop('disabled', true);
-              $(".a").html('${option_a} <i class="fa fa-check-circle"></i>');
+              $(".a").html(option + ' <i class="fa fa-check-circle"></i>');
               $(".b").css('opacity','0.5');
             }
             if(vote == "b"){
+          	  var option = [[${option_b}]];
               $(".b").prop('disabled', true);
-              $(".b").html('${option_b} <i class="fa fa-check-circle"></i>');
+              $(".b").html(option + ' <i class="fa fa-check-circle"></i>');
               $(".a").css('opacity','0.5');
             }
       }
