@@ -9,6 +9,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.malsolo.docker.birthday.voting.domain.Options;
 import com.malsolo.docker.birthday.voting.domain.VoteData;
+import com.malsolo.docker.birthday.voting.repository.VoteDataRepository;
 
 @Controller
 @RequestMapping("/")
@@ -25,11 +28,16 @@ public class HomeController {
 
     private final static String COOKIE_VOTER_ID_NAME = "voter_id";
 
+    private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
+
     private final Options options;
 
+    private final VoteDataRepository repository;
+
     @Autowired
-    public HomeController(Options options) {
+    public HomeController(Options options, VoteDataRepository voteDataRepository) {
         this.options = options;
+        this.repository = voteDataRepository;
     }
 
     @RequestMapping(method = GET)
@@ -49,7 +57,8 @@ public class HomeController {
         }
 
         VoteData voteData = new VoteData(voterId, vote);
-        System.err.println(voteData); // TODO
+        LOG.debug("About to register vote data: {}", voteData);
+        repository.rpush(voteData);
 
         fillModel(model, request.getRemoteHost(), vote);
 
