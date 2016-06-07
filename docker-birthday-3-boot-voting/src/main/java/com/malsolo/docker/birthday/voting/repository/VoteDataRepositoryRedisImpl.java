@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +34,15 @@ public class VoteDataRepositoryRedisImpl implements VoteDataRepository {
     public void rpush(VoteData data) {
         Long lengthOfTheListAfterThePushOperation;
         try {
+
+            RedisConnectionFactory connectionFactory = this.redisTemplate.getConnectionFactory();
+            if (connectionFactory instanceof JedisConnectionFactory) {
+                JedisConnectionFactory jedisConnectionFactory = (JedisConnectionFactory) connectionFactory;
+                LOG.warn("Trying to connect to {}:{}", jedisConnectionFactory.getHostName(), jedisConnectionFactory.getPort());
+            } else {
+                LOG.warn("RedisConnectionFactory class name: " + connectionFactory.getClass().getName());
+            }
+
             lengthOfTheListAfterThePushOperation = this.redisTemplate.opsForList().rightPush(KEY,
                     this.objectMapper.writeValueAsString(data));
         } catch (JsonProcessingException e) {
