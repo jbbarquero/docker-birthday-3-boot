@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,6 +24,9 @@ public class VotePoller {
 
     private final VoteRepository voteRepository;
 
+    @Value("${voter.poll}")
+    private boolean voterPoll;
+
     @Autowired
     public VotePoller(VoteQueueRepository voteQueueRepository, VoteRepository voteRepository) {
         super();
@@ -29,12 +34,20 @@ public class VotePoller {
         this.voteRepository = voteRepository;
     }
 
+    @Async
     public void poll() throws JsonParseException, JsonMappingException, IOException {
+
         LOG.info("Polling...");
-        Vote vote = this.voteQueueRepository.bLPop();
-        LOG.info("Obtained vote: {}", vote);
-        this.voteRepository.save(vote);
-        LOG.info("Polling: done, vote with id {} saved.", vote.getId());
+
+        while (voterPoll) {
+            LOG.info("Polling vote...");
+            Vote vote = this.voteQueueRepository.bLPop();
+            LOG.info("Obtained vote: {}", vote);
+            this.voteRepository.save(vote);
+            LOG.info("Polling DONE, vote with id {} saved.", vote.getId());
+        }
+
+        LOG.info("Polling DONE, poll enabled: {}.", voterPoll);
     }
 
 }

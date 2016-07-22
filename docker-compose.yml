@@ -11,6 +11,14 @@ services:
     networks:
       - back-tier
 
+  worker-app:
+    build: ./docker-birthday-3-boot-worker/.
+    container_name: workerApp
+    ports:
+      - "3000:8080"
+    networks:
+      - back-tier
+
   redis:
     image: redis:alpine
     container_name: redis
