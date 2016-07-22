@@ -34,7 +34,7 @@ public class VotePoller {
         Vote vote = this.voteQueueRepository.bLPop();
         LOG.info("Obtained vote: {}", vote);
         this.voteRepository.save(vote);
-        LOG.info("Polling: done, vote with id {} saved.", vote.getVoterId());
+        LOG.info("Polling: done, vote with id {} saved.", vote.getId());
     }
 
 }

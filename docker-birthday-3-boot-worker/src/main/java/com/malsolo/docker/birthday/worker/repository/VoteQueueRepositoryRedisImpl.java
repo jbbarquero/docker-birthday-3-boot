@@ -13,6 +13,8 @@ import com.malsolo.docker.birthday.worker.domain.Vote;
 @Repository
 public class VoteQueueRepositoryRedisImpl implements VoteQueueRepository {
 
+    public static final String KEY = "votes";
+
     private final StringRedisTemplate redisTemplate;
 
     private final ObjectMapper objectMapper;
@@ -27,7 +29,7 @@ public class VoteQueueRepositoryRedisImpl implements VoteQueueRepository {
     @Override
     public Vote bLPop() {
         try {
-            return objectMapper.readValue(this.redisTemplate.getConnectionFactory().getConnection().bLPop(0, "votes".getBytes()).get(0),
+            return objectMapper.readValue(this.redisTemplate.getConnectionFactory().getConnection().bLPop(0, KEY.getBytes()).get(0),
                     Vote.class);
         } catch (IOException e) {
             throw new RedisSystemException("Error obtaining vote: " + e.getMessage(), e);
